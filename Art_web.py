@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import random
+from datetime import datetime
+import pytz # مكتبة لضبط فارق التوقيت بدقة
 
 # Page configuration and classic vintage design
 st.set_page_config(page_title="Daily Art Explorer", page_icon="🎨", layout="centered")
@@ -23,6 +25,11 @@ st.markdown("""
         padding: 0.6rem 2.5rem;
         font-size: 18px !important;
         font-weight: bold;
+    }
+    .timestamp {
+        font-size: 13px;
+        color: #7F8C8D;
+        font-style: italic;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -77,19 +84,25 @@ if st.button("Discover Artwork"):
                         f"department, brought to the public eye through: *{credit}*."
                     )
 
-                    # Save current painting and its custom description to history
+                    # جلب تاريخ ووقت الاكتشاف الحالي وتنسيقه بتوقيت بغداد
+                    baghdad_tz = pytz.timezone('Asia/Baghdad')
+                    discovery_time = datetime.now(baghdad_tz).strftime("%Y-%m-%d %I:%M:%S %p")
+
+                    # Save current painting, its custom description, and discovery timestamp to history
                     st.session_state.art_history.insert(0, {
                         "title": title,
                         "artist": artist,
                         "year": year,
                         "image": image_url,
-                        "description": description
+                        "description": description,
+                        "discovered_at": discovery_time
                     })
 
                     # Display current art piece
                     st.image(image_url, caption=f"🖼️ {title}", use_container_width=True)
                     st.markdown(f"### {title}")
                     st.markdown(f"**By:** {artist} | **Date:** {year}")
+                    st.markdown(f"<span class='timestamp'>Discovered on: {discovery_time}</span>", unsafe_allow_html=True)
                     st.markdown("---")
                     st.markdown("#### 📜 Artwork Description")
                     st.write(description)
@@ -106,8 +119,10 @@ st.subheader("📜 Art Discovery History")
 
 if st.session_state.art_history:
     for idx, item in enumerate(st.session_state.art_history):
-        with st.expander(f"Painting #{len(st.session_state.art_history) - idx}: {item['title']} - {item['artist']}"):
+        # تظهر تفاصيل كل لوحة في السجل وبجانبها تاريخ ووقت اكتشافها بدقة
+        with st.expander(f"Painting #{len(st.session_state.art_history) - idx}: {item['title']} (Discovered: {item['discovered_at']})"):
             st.image(item['image'], use_container_width=True)
             st.write(item['description'])
+            st.markdown(f"<span class='timestamp'>Saved to history on: {item['discovered_at']}</span>", unsafe_allow_html=True)
 else:
     st.info("Your discovered masterpieces will appear here. Click 'Discover Artwork' to start!")
