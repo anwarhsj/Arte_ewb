@@ -34,8 +34,8 @@ if "art_history" not in st.session_state:
 st.title("🎨 Daily Art Explorer")
 st.write("Click the button below to discover a masterpiece from world-class museums.")
 
-# The main discovery button in Arabic as requested
-if st.button("اكتشف لوحة"):
+# The main discovery button in English
+if st.button("Discover Artwork"):
     with st.spinner("Searching the gallery archives... 🔍"):
         try:
             # Fetching data from the Metropolitan Museum of Art API
@@ -110,4 +110,4 @@ if st.session_state.art_history:
             st.image(item['image'], use_container_width=True)
             st.write(item['description'])
 else:
-    st.info("Your discovered masterpieces will appear here. Click 'اكتشف لوحة' to start!")
+    st.info("Your discovered masterpieces will appear here. Click 'Discover Artwork' to start!")س
